@@ -1,4 +1,4 @@
-import router from "./routes";
+import router from "./routes"
 import sequelize from "./config/connection"; // Import the sequelize instance
 import { registerSwagger } from "./interfaces/swagger/swagger";
 
