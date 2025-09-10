@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
+import Usuario from '../models/Usuario';
 
 dotenv.config();
 
@@ -9,8 +10,8 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD, // mudar senha
   host: process.env.DB_HOST, // colocar domínio
   port: parseInt(process.env.DB_PORT), // colocar porta
-  dialect: 'mysql', // colocar o banco de dados utilizado
-  models: [],  // Adicionar os modelos a serem trabalhados aqui
+  dialect: 'postgres', // colocar o banco de dados utilizado
+  models: [Usuario],  // Adicionar os modelos a serem trabalhados aqui
 });
 
 export default sequelize;
