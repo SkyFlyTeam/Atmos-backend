@@ -1,4 +1,6 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript'
+import { Table, Column, Model, DataType, BelongsToMany } from 'sequelize-typescript';
+import TipoParametro from './TipoParametro';
+import EstacaoTipoParametro from './EstacaoTipoParametro';
 
 @Table({
     tableName: 'estacoes',
@@ -11,53 +13,56 @@ export default class Estacao extends Model {
         primaryKey: true,
         autoIncrement: true
     })
-    pk!: number
+    pk!: number;
 
     @Column({
         type: DataType.STRING(255),
         allowNull: false
     })
-    uuid!: string
+    uuid!: string;
 
     @Column({
         type: DataType.STRING(255),
         allowNull: false
     })
-    nome!: string
+    nome!: string;
 
     @Column({
-        type: DataType.TEXT,  
+        type: DataType.TEXT,
         allowNull: false
     })
-    descricao!: string
+    descricao!: string;
 
     @Column({
         type: DataType.STRING(255),
-        allowNull: true 
+        allowNull: true
     })
-    link!: string | null
+    link!: string | null;
 
     @Column({
         type: DataType.BOOLEAN,
         allowNull: false
     })
-    status!: boolean
+    status!: boolean;
 
     @Column({
         type: DataType.STRING(255),
-        allowNull: true  
+        allowNull: true
     })
-    lat!: string | null
+    lat!: string | null;
 
     @Column({
         type: DataType.STRING(255),
-        allowNull: true  
+        allowNull: true
     })
-    long!: string | null
+    long!: string | null;
 
     @Column({
         type: DataType.STRING(255),
-        allowNull: true  
+        allowNull: true
     })
-    endereco!: string | null
+    endereco!: string | null;
+
+    @BelongsToMany(() => TipoParametro, () => EstacaoTipoParametro, 'estacao_est_pk', 'tipo_parametro_pk')
+    tipoParametros!: TipoParametro[];
 }
