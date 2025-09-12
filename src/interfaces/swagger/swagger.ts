@@ -1,6 +1,9 @@
 import { Express } from "express";
 import swaggerUi from "swagger-ui-express";
 import { estacaoSwagger } from './estacaoSwagger'
+import { tipoParametroSwagger } from './tipoParametroSwagger'
+import { estacaoTipoParametroSwagger } from './estacaoTipoParametroSwagger'
+import { valorCapturadoSwagger } from './valorCapturadoSwagger'
 
 export function registerSwagger(app: Express): void {
   const openapi = {
@@ -12,7 +15,10 @@ export function registerSwagger(app: Express): void {
     },
     servers: [{ url: "/" }],
     paths: {
-      ...estacaoSwagger
+      ...estacaoSwagger,
+      ...tipoParametroSwagger,
+      ...estacaoTipoParametroSwagger,
+      ...valorCapturadoSwagger
     },
   } as const
 
