@@ -1,6 +1,8 @@
 import { Table, Column, Model, DataType, BelongsToMany } from 'sequelize-typescript';
 import Estacao from './Estacao';
 import EstacaoTipoParametro from './EstacaoTipoParametro';
+import TipoAlerta from './TipoAlerta';
+import TipoAlertaParametro from './TipoAlertaParametro';
 
 @Table({
     tableName: 'tipo_parametro',
@@ -65,4 +67,7 @@ export default class TipoParametro extends Model {
 
     @BelongsToMany(() => Estacao, () => EstacaoTipoParametro, 'tipo_parametro_pk', 'estacao_est_pk')
     estacoes!: Estacao[];
+
+    @BelongsToMany(() => TipoAlerta, () => TipoAlertaParametro, 'Tipo_parametro_p', 'Tipo_Alerta_pk')
+    tipoAlertas!: TipoAlerta[];
 }
