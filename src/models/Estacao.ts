@@ -34,10 +34,10 @@ export default class Estacao extends Model {
     descricao!: string;
 
     @Column({
-        type: DataType.STRING(255),
+        type: DataType.BLOB('long'),
         allowNull: true
     })
-    link!: string | null;
+    imagem!: Buffer | null;
 
     @Column({
         type: DataType.BOOLEAN,
