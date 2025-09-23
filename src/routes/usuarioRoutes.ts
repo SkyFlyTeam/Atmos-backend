@@ -8,5 +8,6 @@ routes.get('/', usuarioController.findAll);     // Listar
 routes.get('/:pk', usuarioController.findById);     // Listar
 routes.put('/:pk', usuarioController.update);   // Atualizar
 routes.delete('/:pk', usuarioController.delete); // Deletar
+routes.post('/login', usuarioController.login)  // Login
 
 export default routes;
