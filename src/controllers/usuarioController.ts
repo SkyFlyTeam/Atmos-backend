@@ -1,13 +1,14 @@
 import { Request, Response } from 'express'
 import Usuario from '../models/Usuario'
+import jwt from 'jsonwebtoken'
 
 export const usuarioController = {
     save: async (req: Request, res: Response) => {
         try {
-            const { nome, email, senha} = req.body
+            const { nome, email, senha } = req.body
 
-            if(!nome || !email || !senha){
-                return res.status(401).json({message: 'Nome, email e senha são obrigados!'})
+            if (!nome || !email || !senha) {
+                return res.status(401).json({ message: 'Nome, email e senha são obrigados!' })
             }
 
             const novoRegistro = await Usuario.create(req.body)
@@ -20,11 +21,11 @@ export const usuarioController = {
     findAll: async (req: Request, res: Response) => {
         try {
             const registros = await Usuario.findAll()
-            if(registros){
+            if (registros) {
                 return res.status(200).json(registros)
             }
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar registros', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar registros', detalhes: error.message })
         }
     },
 
@@ -33,50 +34,79 @@ export const usuarioController = {
             let { pk } = (req.params)
             const id = parseInt(pk)
             const registro = await Usuario.findByPk(id)
-            if(registro) {
+            if (registro) {
                 return res.status(200).json(registro)
             }
             return res.status(404).json({ error: 'Registro não encontrado' })
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar registro', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar registro', detalhes: error.message })
+        }
+    },
+
+    login: async (req: Request, res: Response) => {
+        try {
+            const { email, senha } = req.body
+            const registro = await Usuario.findOne({ where: { email: email } })
+
+            
+            if (!registro)
+                return res.status(404).json({ error: 'Registro não encontrado' })
+
+            if (registro.senha != senha)
+                return res.status(404).json({ error: 'Credencial inválida' })
+            
+            const token = jwt.sign(
+                { id: registro.id, nome: registro.nome, email: registro.email },
+                process.env.JWT_KEY,
+                {   expiresIn: (process.env.JWT_LIFE ? process.env.JWT_LIFE : "120s") }
+            );
+
+            return res.status(200).json({
+                id: registro.id,
+                nome: registro.nome,
+                email: registro.email,
+                token: token
+            })
+        } catch (error) {
+            return res.status(500).json({ error: 'Erro ao buscar registro', detalhes: error.message })
         }
     },
 
     update: async (req: Request, res: Response) => {
         try {
-        const { pk } = req.params;
+            const { pk } = req.params;
 
-        const registro = await Usuario.findByPk(pk)
-        if(!registro){
-            return res.status(404).json({ error: 'Registro não encontrado' })
-        }
+            const registro = await Usuario.findByPk(pk)
+            if (!registro) {
+                return res.status(404).json({ error: 'Registro não encontrado' })
+            }
 
-        const atualizado = await Usuario.update(req.body, { where: { pk } });
+            const atualizado = await Usuario.update(req.body, { where: { pk } });
 
-        if (atualizado) {
-            const registro = await Usuario.findByPk(pk);
-            return res.json(registro);
-        }
+            if (atualizado) {
+                const registro = await Usuario.findByPk(pk);
+                return res.json(registro);
+            }
 
-        return res.status(404).json({ error: 'Registro não encontrado' });
+            return res.status(404).json({ error: 'Registro não encontrado' });
         } catch (error: any) {
-        return res.status(400).json({ error: 'Erro ao atualizar registro', detalhes: error.message });
+            return res.status(400).json({ error: 'Erro ao atualizar registro', detalhes: error.message });
         }
     },
 
     delete: async (req: Request, res: Response) => {
         try {
-        const { pk } = req.params
+            const { pk } = req.params
 
-        const deletado = await Usuario.destroy({ where: { pk } });
+            const deletado = await Usuario.destroy({ where: { pk } });
 
-        if (deletado) {
-            return res.status(204).send();
-        }
+            if (deletado) {
+                return res.status(204).send();
+            }
 
-        return res.status(404).json({ error: 'Registro não encontrado' });
+            return res.status(404).json({ error: 'Registro não encontrado' });
         } catch (error: any) {
-        return res.status(400).json({ error: 'Erro ao deletar registro', detalhes: error.message });
+            return res.status(400).json({ error: 'Erro ao deletar registro', detalhes: error.message });
         }
     }
 } 
