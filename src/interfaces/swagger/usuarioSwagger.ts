@@ -170,4 +170,45 @@ export const usuarioSwagger = {
       },
     },
   },
+  "/usuario/login": {
+    post: {
+      summary: "Acessar um usuário",
+      requestBody: {
+        description: "Dados do usuário para ter acesso",
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                email: { type: "string" },
+                senha: { type: "string" },
+              },
+              required: ["email", "senha"],
+            },
+          },
+        },
+      },
+      responses: {
+        "200": {
+          description: "Usuário acessado com sucesso",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  pk: { type: "integer" },
+                  nome: { type: "string" },
+                  email: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "400": {
+          description: "Erro de validação",
+        },
+      },
+    },
+  },
 };
