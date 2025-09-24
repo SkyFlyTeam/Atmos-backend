@@ -1,17 +1,23 @@
 import { Request, Response } from 'express'
 import Usuario from '../models/Usuario'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+
+const saltRounds = 10; 
 
 export const usuarioController = {
     save: async (req: Request, res: Response) => {
         try {
-            const { nome, email, senha } = req.body
+            //const { nome, email, senha } = req.body
+            const reg = req.body
 
-            if (!nome || !email || !senha) {
+            if (!reg.nome || !reg.email || !reg.senha) {
                 return res.status(401).json({ message: 'Nome, email e senha são obrigados!' })
             }
 
-            const novoRegistro = await Usuario.create(req.body)
+            reg.senha = await bcrypt.hash(reg.senha, saltRounds)
+
+            const novoRegistro = await Usuario.create(reg)
             return res.status(201).json(novoRegistro)
         } catch (error) {
             return res.status(400).json({ error: 'Erro ao salvar usuário', detalhes: error.message })
@@ -52,7 +58,7 @@ export const usuarioController = {
             if (!registro)
                 return res.status(404).json({ error: 'Registro não encontrado' })
 
-            if (registro.senha != senha)
+            if (!(await bcrypt.compare(senha, registro.senha)))
                 return res.status(404).json({ error: 'Credencial inválida' })
             
             const token = jwt.sign(
@@ -75,13 +81,17 @@ export const usuarioController = {
     update: async (req: Request, res: Response) => {
         try {
             const { pk } = req.params;
+            const novoRegistro = req.body;
 
             const registro = await Usuario.findByPk(pk)
             if (!registro) {
                 return res.status(404).json({ error: 'Registro não encontrado' })
             }
 
-            const atualizado = await Usuario.update(req.body, { where: { pk } });
+            if(novoRegistro.senha != registro.senha)
+                novoRegistro.senha = await bcrypt.hash(novoRegistro.senha, saltRounds)
+
+            const atualizado = await Usuario.update(novoRegistro, { where: { pk } });
 
             if (atualizado) {
                 const registro = await Usuario.findByPk(pk);
