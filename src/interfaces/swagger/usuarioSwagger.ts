@@ -211,4 +211,25 @@ export const usuarioSwagger = {
       },
     },
   },
+  "/usuario/auth": {
+    get: {
+      summary: "Verificar Token de usuário",
+      security: [{
+        bearerAuth: [{
+          type: "http",
+          description: "JWT Authorization header using the Bearer scheme.",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }],
+      }],
+      responses: {
+        "200": {
+          description: "Token de usuário: válido.",
+        },
+        "401": {
+          description: "Token de usuário: inválido.",
+        },
+      },
+    },
+  },
 };

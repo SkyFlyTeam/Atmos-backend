@@ -3,11 +3,12 @@ import { usuarioController } from '../controllers/usuarioController';
 
 const routes = Router();
 
-routes.post('/', usuarioController.save);       // Criar
-routes.get('/', usuarioController.findAll);     // Listar
+routes.post('/', usuarioController.save);           // Criar
+routes.get('/', usuarioController.findAll);         // Listar
+routes.get('/auth', usuarioController.auth);        // Auth
+routes.post('/login', usuarioController.login);     // Login
 routes.get('/:pk', usuarioController.findById);     // Listar
-routes.put('/:pk', usuarioController.update);   // Atualizar
-routes.delete('/:pk', usuarioController.delete); // Deletar
-routes.post('/login', usuarioController.login)  // Login
+routes.put('/:pk', usuarioController.update);       // Atualizar
+routes.delete('/:pk', usuarioController.delete);    // Deletar
 
 export default routes;

@@ -1,6 +1,9 @@
 import router from "./routes"
 import sequelize from "./config/connection"; // Import the sequelize instance
 import { registerSwagger } from "./interfaces/swagger/swagger";
+import { NextFunction, Request, Response } from "express";
+import AuthToken from "./utils/auth";
+
 
 const express = require('express');
 const app = express();
@@ -10,6 +13,17 @@ const bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json({ limit: "20mb" }));
 app.use(bodyParser.urlencoded({ limit: "20mb", extended: true }));
+// app.use(function(req: Request, res: Response, next: NextFunction) {
+
+//   if (!['POST', 'PUT', 'DELETE'].includes(req.method) || req.url == '/usuario/login')
+//     return next();
+
+//   const authToken = AuthToken(req);
+//   if (authToken.status != 200)
+//     return res.status(401).json({ message: authToken.message, detalhes: authToken.detalhes });
+
+//   next();
+// });
 app.use(router);
 registerSwagger(app)
 
