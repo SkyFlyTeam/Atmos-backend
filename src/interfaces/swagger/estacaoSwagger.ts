@@ -18,6 +18,23 @@ export const estacaoSwagger = {
                 lat: { type: "string", nullable: true },
                 long: { type: "string", nullable: true },
                 endereco: { type: "string", nullable: true },
+
+                // NOVO: cidade (enviar ao menos o ibgeId para vincular)
+                cidadeIbgeId: { type: "integer", nullable: true, description: "ID do município no IBGE" },
+                cidadeNome: { type: "string", nullable: true, description: "Nome da cidade (cache/visualização)" },
+                cidadeUf: {
+                  type: "string",
+                  nullable: true,
+                  description: "UF da cidade",
+                  pattern: "^[A-Z]{2}$"
+                },
+
+                // NOVO: imagem base64 (data URL)
+                imagemBase64: {
+                  type: "string",
+                  nullable: true,
+                  description: "Imagem em Data URL (ex.: data:image/jpeg;base64,...)"
+                },
               },
               required: ["uuid", "nome", "descricao", "status"],
             },
@@ -41,14 +58,20 @@ export const estacaoSwagger = {
                   lat: { type: "string", nullable: true },
                   long: { type: "string", nullable: true },
                   endereco: { type: "string", nullable: true },
+
+                  // NOVO: cidade retornada (flatten)
+                  cidadeIbgeId: { type: "integer", nullable: true },
+                  cidadeNome: { type: "string", nullable: true },
+                  cidadeUf: { type: "string", nullable: true, pattern: "^[A-Z]{2}$" },
+
+                  // NOVO
+                  imagemBase64: { type: "string", nullable: true },
                 },
               },
             },
           },
         },
-        "400": {
-          description: "Erro de validação",
-        },
+        "400": { description: "Erro de validação" },
       },
     },
     get: {
@@ -72,18 +95,25 @@ export const estacaoSwagger = {
                     lat: { type: "string", nullable: true },
                     long: { type: "string", nullable: true },
                     endereco: { type: "string", nullable: true },
+
+                    // NOVO
+                    cidadeIbgeId: { type: "integer", nullable: true },
+                    cidadeNome: { type: "string", nullable: true },
+                    cidadeUf: { type: "string", nullable: true, pattern: "^[A-Z]{2}$" },
+
+                    // NOVO
+                    imagemBase64: { type: "string", nullable: true },
                   },
                 },
               },
             },
           },
         },
-        "404": {
-          description: "Nenhuma estação encontrada",
-        },
+        "404": { description: "Nenhuma estação encontrada" },
       },
     },
   },
+
   "/estacao/{pk}": {
     get: {
       summary: "Obter uma estação pelo ID",
@@ -113,16 +143,23 @@ export const estacaoSwagger = {
                   lat: { type: "string", nullable: true },
                   long: { type: "string", nullable: true },
                   endereco: { type: "string", nullable: true },
+
+                  // NOVO
+                  cidadeIbgeId: { type: "integer", nullable: true },
+                  cidadeNome: { type: "string", nullable: true },
+                  cidadeUf: { type: "string", nullable: true, pattern: "^[A-Z]{2}$" },
+
+                  // NOVO
+                  imagemBase64: { type: "string", nullable: true },
                 },
               },
             },
           },
         },
-        "404": {
-          description: "Estação não encontrada",
-        },
+        "404": { description: "Estação não encontrada" },
       },
     },
+
     put: {
       summary: "Atualizar uma estação",
       parameters: [
@@ -150,6 +187,18 @@ export const estacaoSwagger = {
                 lat: { type: "string", nullable: true },
                 long: { type: "string", nullable: true },
                 endereco: { type: "string", nullable: true },
+
+                // NOVO
+                cidadeIbgeId: { type: "integer", nullable: true },
+                cidadeNome: { type: "string", nullable: true },
+                cidadeUf: { type: "string", nullable: true, pattern: "^[A-Z]{2}$" },
+
+                // NOVO
+                imagemBase64: {
+                  type: "string",
+                  nullable: true,
+                  description: "Data URL; use null para remover a imagem atual"
+                },
               },
               required: ["uuid", "nome", "descricao", "status"],
             },
@@ -173,16 +222,23 @@ export const estacaoSwagger = {
                   lat: { type: "string", nullable: true },
                   long: { type: "string", nullable: true },
                   endereco: { type: "string", nullable: true },
+
+                  // NOVO
+                  cidadeIbgeId: { type: "integer", nullable: true },
+                  cidadeNome: { type: "string", nullable: true },
+                  cidadeUf: { type: "string", nullable: true, pattern: "^[A-Z]{2}$" },
+
+                  // NOVO
+                  imagemBase64: { type: "string", nullable: true },
                 },
               },
             },
           },
         },
-        "404": {
-          description: "Estação não encontrada",
-        },
+        "404": { description: "Estação não encontrada" },
       },
     },
+
     delete: {
       summary: "Excluir uma estação",
       parameters: [
@@ -195,12 +251,8 @@ export const estacaoSwagger = {
         },
       ],
       responses: {
-        "204": {
-          description: "Estação deletada com sucesso",
-        },
-        "404": {
-          description: "Estação não encontrada",
-        },
+        "204": { description: "Estação deletada com sucesso" },
+        "404": { description: "Estação não encontrada" },
       },
     },
   },
