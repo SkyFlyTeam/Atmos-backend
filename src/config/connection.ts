@@ -7,6 +7,7 @@ import ValorCapturado from '../models/ValorCapturado';
 import Usuario from '../models/Usuario';
 import TipoAlertaParametro from '../models/TipoAlertaParametro';
 import TipoAlerta from '../models/TipoAlerta';
+import Cidade from '../models/Cidade';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST, // colocar domínio
   port: parseInt(process.env.DB_PORT), // colocar porta
   dialect: 'postgres', // colocar o banco de dados utilizado
-  models: [Estacao, TipoParametro, EstacaoTipoParametro, ValorCapturado, Usuario, TipoAlerta, TipoAlertaParametro],  // Adicionar os modelos a serem trabalhados aqui
+  models: [Estacao, Cidade , TipoParametro, EstacaoTipoParametro, ValorCapturado, Usuario, TipoAlerta, TipoAlertaParametro],  // Adicionar os modelos a serem trabalhados aqui
 });
 
 export default sequelize;
