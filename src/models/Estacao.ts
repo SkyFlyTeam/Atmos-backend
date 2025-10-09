@@ -1,6 +1,7 @@
-import { Table, Column, Model, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsToMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import TipoParametro from './TipoParametro';
 import EstacaoTipoParametro from './EstacaoTipoParametro';
+import Cidade from './Cidade';
 
 @Table({
     tableName: 'estacoes',
@@ -62,6 +63,17 @@ export default class Estacao extends Model {
         allowNull: true
     })
     endereco!: string | null;
+
+    //relacao com cidade
+    @ForeignKey(() => Cidade)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true
+    })
+    cidadePk!: number;
+
+    @BelongsTo(() => Cidade)
+    cidade!: Cidade | null;
 
     @BelongsToMany(() => TipoParametro, () => EstacaoTipoParametro, 'estacao_est_pk', 'tipo_parametro_pk')
     tipoParametros!: TipoParametro[];
