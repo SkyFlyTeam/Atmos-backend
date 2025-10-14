@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Serviço para o Backend Express.js
+  backend:
+    build:
+      context: .        # Caminho para o diretório do backend
+      dockerfile: Dockerfile     # Caminho para o Dockerfile do backend
+    container_name: express-backend
+    ports:
+      - "5000:5000"             # Mapeia a porta 3000 para o host
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres        # O nome do serviço do PostgreSQL no Docker Compose
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=mydatabase
+      - JWT_KEY=ATMOSSAPINHO
+    depends_on:
+      - postgres
+
+  # Serviço para o banco de dados PostgreSQL
+  postgres:
+    image: postgres:13         # Usando a imagem oficial do PostgreSQL
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres  # Usuário para o banco
+      - POSTGRES_PASSWORD=postgres  # Senha do banco
+      - POSTGRES_DB=mydatabase    # Nome do banco de dados
+    ports:
+      - "5432:5432"             # Mapeia a porta 5432 para o host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistência de dados
+
+volumes:
+  postgres_data:    
