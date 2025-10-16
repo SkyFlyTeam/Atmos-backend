@@ -2,30 +2,39 @@ import { Request, Response } from 'express'
 import ValorCapturado from '../models/ValorCapturado'
 import EstacaoTipoParametro from '../models/EstacaoTipoParametro'
 import Estacao from '../models/Estacao'
+import TipoParametro from '../models/TipoParametro'
+import sequelize from 'sequelize'
 
 export const valorCapturadoController = {
     save: async (req: Request, res: Response) => {
         try {
             const { unixtime, Parametros_pk, valor, estacao_id } = req.body
-            
+
             // Verificar se o parâmetro existe
             const parametro = await EstacaoTipoParametro.findByPk(Parametros_pk)
             if (!parametro) {
                 return res.status(404).json({ error: 'Parâmetro não encontrado' })
             }
-            
+
             // Verificar se a estação existe
             const estacao = await Estacao.findByPk(estacao_id)
             if (!estacao) {
                 return res.status(404).json({ error: 'Estação não encontrada' })
             }
-            
+
             // Verificar se a estação do parâmetro corresponde à estação fornecida
-            if (parametro.estacao_est_pk !== estacao_id) {
+            if (parametro.estacao_est_pk !== parseInt(estacao_id)) {
                 return res.status(400).json({ error: 'A estação do parâmetro não corresponde à estação fornecida' })
             }
-            
-            const novoValor = await ValorCapturado.create(req.body)
+
+            const unixdate = new Date(unixtime * 1000)
+            const formatValor = {
+                unixtime: unixdate,
+                Parametros_pk: Parametros_pk,
+                valor: valor,
+                estacao_id: estacao_id
+            }
+            const novoValor = await ValorCapturado.create(formatValor)
             return res.status(201).json(novoValor)
         } catch (error) {
             return res.status(400).json({ error: 'Erro ao salvar valor capturado', detalhes: error.message })
@@ -57,13 +66,13 @@ export const valorCapturadoController = {
                 ],
                 order: [['unixtime', 'DESC']]
             })
-            
-            if(!valores.length){
+
+            if (!valores.length) {
                 return res.status(404).json({ error: 'Valores não encontrados' })
             }
             return res.status(200).json(valores)
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar valores', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar valores', detalhes: error.message })
         }
     },
 
@@ -92,13 +101,12 @@ export const valorCapturadoController = {
                     }
                 ]
             })
-            
-            if(valor) {
+            if (valor) {
                 return res.status(200).json(valor)
             }
             return res.status(404).json({ error: 'Valor não encontrado' })
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar valor', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar valor', detalhes: error.message })
         }
     },
 
@@ -129,13 +137,13 @@ export const valorCapturadoController = {
                 ],
                 order: [['unixtime', 'DESC']]
             })
-            
-            if(!valores.length){
+
+            if (!valores.length) {
                 return res.status(404).json({ error: 'Nenhum valor encontrado para este parâmetro' })
             }
             return res.status(200).json(valores)
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar valores do parâmetro', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar valores do parâmetro', detalhes: error.message })
         }
     },
 
@@ -166,36 +174,36 @@ export const valorCapturadoController = {
                 ],
                 order: [['unixtime', 'DESC']]
             })
-            
-            if(!valores.length){
+            console.log(JSON.stringify(valores))
+            if (!valores.length) {
                 return res.status(404).json({ error: 'Nenhum valor encontrado para esta estação' })
             }
             return res.status(200).json(valores)
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar valores da estação', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar valores da estação', detalhes: error.message })
         }
     },
 
     findByDateRange: async (req: Request, res: Response) => {
         try {
             const { start_date, end_date, estacao_id, parametro_pk } = req.query
-            
+
             let whereClause: any = {}
-            
+
             if (start_date && end_date) {
                 whereClause.unixtime = {
                     [require('sequelize').Op.between]: [new Date(start_date as string), new Date(end_date as string)]
                 }
             }
-            
+
             if (estacao_id) {
                 whereClause.estacao_id = estacao_id
             }
-            
+
             if (parametro_pk) {
                 whereClause.Parametros_pk = parametro_pk
             }
-            
+
             const valores = await ValorCapturado.findAll({
                 where: whereClause,
                 include: [
@@ -220,13 +228,106 @@ export const valorCapturadoController = {
                 ],
                 order: [['unixtime', 'DESC']]
             })
-            
-            if(!valores.length){
+
+            if (!valores.length) {
                 return res.status(404).json({ error: 'Nenhum valor encontrado para os filtros aplicados' })
             }
             return res.status(200).json(valores)
         } catch (error) {
-            return res.status(500).json({error: 'Erro ao buscar valores por período', detalhes: error.message})
+            return res.status(500).json({ error: 'Erro ao buscar valores por período', detalhes: error.message })
+        }
+    },
+
+    findAllReport: async (req: Request, res: Response) => {
+        try {
+            const valores = await ValorCapturado.findAll({
+                attributes: [
+                    [sequelize.fn('MAX', sequelize.col('valor')), 'maximo'],
+                    [sequelize.fn('MIN', sequelize.col('valor')), 'minimo'],
+                    [sequelize.fn('AVG', sequelize.col('valor')), 'media'],
+                    'Parametros_pk',
+                    'estacao_id',
+                ],
+                include: [
+                    {
+                        model: EstacaoTipoParametro,
+                        as: 'parametro',
+                        include: [
+                            {
+                                model: TipoParametro,
+                                as: 'tipoParametro',
+                            }
+                        ],
+                    }
+                ],
+                group: ['Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
+            })
+
+            if (!valores.length) {
+                return res.status(404).json({ error: 'Valores não encontrados' })
+            }
+            return res.status(200).json(valores)
+        } catch (error) {
+            return res.status(500).json({ error: 'Erro ao montar relatório completo', detalhes: error.message })
+        }
+    },
+
+    findByDateRangeReport: async (req: Request, res: Response) => {
+        try {
+            const { start_date, end_date, estacao_id, parametro_pk } = req.query
+
+            let whereClause: any = {}
+
+            let start_date_ready = 0
+            let end_date_ready = Date.now();
+            if (start_date)
+                start_date_ready = parseInt(start_date as string)
+
+            if (end_date)
+                end_date_ready = parseInt(end_date as string)
+
+            whereClause.unixtime = {
+                [require('sequelize').Op.between]: [new Date(start_date_ready * 1000), new Date(end_date_ready * 1000)]
+            }
+
+            if (estacao_id) {
+                whereClause.estacao_id = estacao_id
+            }
+
+            if (parametro_pk) {
+                whereClause.Parametros_pk = parametro_pk
+            }
+
+            const valores = await ValorCapturado.findAll({
+                where: whereClause,
+                attributes: [
+                    [sequelize.fn('MAX', sequelize.col('valor')), 'maximo'],
+                    [sequelize.fn('MIN', sequelize.col('valor')), 'minimo'],
+                    [sequelize.fn('AVG', sequelize.col('valor')), 'media'],
+                    'Parametros_pk',
+                    'estacao_id',
+                ],
+                include: [
+                    {
+                        model: EstacaoTipoParametro,
+                        as: 'parametro',
+                        include: [
+                            {
+                                model: TipoParametro,
+                                as: 'tipoParametro'
+                            }
+                        ]
+                    },
+                ],
+                group: ['Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
+            })
+
+            if (!valores.length) {
+                return res.status(404).json({ error: 'Nenhum valor encontrado para os filtros aplicados' })
+            }
+            return res.status(200).json(valores)
+        } catch (error) {
+            return res.status(500).json({ error: 'Erro ao montar relatório por período', detalhes: error.message })
         }
     },
 
@@ -236,7 +337,7 @@ export const valorCapturadoController = {
             const { unixtime, Parametros_pk, valor, estacao_id } = req.body
 
             const valorCapturado = await ValorCapturado.findByPk(pk)
-            if(!valorCapturado){
+            if (!valorCapturado) {
                 return res.status(404).json({ error: 'Valor não encontrado' })
             }
 
@@ -247,7 +348,7 @@ export const valorCapturadoController = {
                     return res.status(404).json({ error: 'Parâmetro não encontrado' })
                 }
             }
-            
+
             // Verificar se a estação existe
             if (estacao_id) {
                 const estacao = await Estacao.findByPk(estacao_id)
