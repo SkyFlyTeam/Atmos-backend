@@ -26,15 +26,8 @@ export const valorCapturadoController = {
             if (parametro.estacao_est_pk !== parseInt(estacao_id)) {
                 return res.status(400).json({ error: 'A estação do parâmetro não corresponde à estação fornecida' })
             }
-
-            const unixdate = new Date(unixtime * 1000)
-            const formatValor = {
-                unixtime: unixdate,
-                Parametros_pk: Parametros_pk,
-                valor: valor,
-                estacao_id: estacao_id
-            }
-            const novoValor = await ValorCapturado.create(formatValor)
+            
+            const novoValor = await ValorCapturado.create(req.body)
             return res.status(201).json(novoValor)
         } catch (error) {
             return res.status(400).json({ error: 'Erro ao salvar valor capturado', detalhes: error.message })
@@ -260,6 +253,7 @@ export const valorCapturadoController = {
                         ],
                     }
                 ],
+                order: [['estacao_id', 'ASC']],
                 group: ['Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
             })
 
@@ -272,7 +266,7 @@ export const valorCapturadoController = {
         }
     },
 
-    findByDateRangeReport: async (req: Request, res: Response) => {
+    findByFilterReport: async (req: Request, res: Response) => {
         try {
             const { start_date, end_date, estacao_id, parametro_pk } = req.query
 
@@ -319,6 +313,7 @@ export const valorCapturadoController = {
                         ]
                     },
                 ],
+                order: [['estacao_id', 'ASC']],
                 group: ['Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
             })
 
