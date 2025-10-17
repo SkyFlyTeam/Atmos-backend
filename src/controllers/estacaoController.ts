@@ -55,7 +55,7 @@ export const estacaoController = {
 
   findAll: async (_req: Request, res: Response) => {
     try {
-      const registros = await Estacao.findAll({ include: [Cidade] }); // <— include
+      const registros = await Estacao.findAll();
 
       if (!registros.length) {
         return res.status(404).json({ error: 'Registros não encontrados' });
@@ -70,7 +70,7 @@ export const estacaoController = {
   findById: async (req: Request, res: Response) => {
     try {
       const { pk } = req.params;
-      const registro = await Estacao.findByPk(pk, { include: [Cidade] }); // <— include
+      const registro = await Estacao.findByPk(pk);
       if (!registro) return res.status(404).json({ error: 'Registro não encontrado' });
       return res.status(200).json(mapEstacao(registro));
     } catch (error: any) {
