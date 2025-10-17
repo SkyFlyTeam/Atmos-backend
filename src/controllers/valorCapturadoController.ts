@@ -26,7 +26,7 @@ export const valorCapturadoController = {
             if (parametro.estacao_est_pk !== parseInt(estacao_id)) {
                 return res.status(400).json({ error: 'A estação do parâmetro não corresponde à estação fornecida' })
             }
-            
+
             const novoValor = await ValorCapturado.create(req.body)
             return res.status(201).json(novoValor)
         } catch (error) {
@@ -272,16 +272,26 @@ export const valorCapturadoController = {
 
             let whereClause: any = {}
 
-            let start_date_ready = 0
-            let end_date_ready = Date.now();
+            let start_date_ready: string | number = 0
+            let end_date_ready: string | number = Date.now() * 1000;
             if (start_date)
-                start_date_ready = parseInt(start_date as string)
+                if(Number(start_date))
+                    start_date_ready = parseInt(start_date as string) * 1000
+                else
+                    if(new Date(start_date as string))
+                        start_date_ready = start_date as string;
 
             if (end_date)
-                end_date_ready = parseInt(end_date as string)
+                if(Number(end_date))
+                    end_date_ready = parseInt(end_date as string) * 1000
+                else
+                    if(new Date(end_date as string))
+                        end_date_ready = end_date as string;
+
+
 
             whereClause.unixtime = {
-                [require('sequelize').Op.between]: [new Date(start_date_ready * 1000), new Date(end_date_ready * 1000)]
+                [require('sequelize').Op.between]: [new Date(start_date_ready), new Date(end_date_ready)]
             }
 
             if (estacao_id) {
