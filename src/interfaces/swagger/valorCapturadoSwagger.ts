@@ -108,6 +108,92 @@ export const valorCapturadoSwagger = {
       },
     },
   },
+  "/valor-capturado/relatorio": {
+    get: {
+      summary: "Obter valores capturados salvos",
+      parameters: [
+        {
+          in: "query",
+          name: "start_date",
+          required: false,
+          schema: {
+            anyOf: [
+              {type: "string", format: "date-time"},
+              {type: "integer"},
+            ],
+          },
+          description: "Data de início do período, unixtime ou timestamp",
+        },
+        {
+          in: "query",
+          name: "end_date",
+          required: false,
+          schema: {
+            anyOf: [
+              {type: "string", format: "date-time"},
+              {type: "integer"},
+            ],
+          },
+          description: "Data de fim do período",
+        },
+      ],
+      responses: {
+        "200": {
+          description: "Valores capturados encontrados",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  pk: { type: "integer" },
+                  unixtime: { type: "string", format: "date-time" },
+                  Parametros_pk: { type: "integer" },
+                  valor: { type: "number" },
+                  estacao_id: { type: "integer" },
+                  parametro: {
+                    type: "object",
+                    properties: {
+                      pk: { type: "integer" },
+                      estacao_est_pk: { type: "integer" },
+                      tipo_parametro_pk: { type: "integer" },
+                      estacao: {
+                        type: "object",
+                        properties: {
+                          pk: { type: "integer" },
+                          uuid: { type: "string" },
+                          nome: { type: "string" },
+                        },
+                      },
+                      tipoParametro: {
+                        type: "object",
+                        properties: {
+                          pk: { type: "integer" },
+                          nome: { type: "string" },
+                          tipo: { type: "string" },
+                          unidade: { type: "string" },
+                        },
+                      },
+                    },
+                  },
+                  estacao: {
+                    type: "object",
+                    properties: {
+                      pk: { type: "integer" },
+                      uuid: { type: "string" },
+                      nome: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "404": {
+          description: "Valores capturados não encontrados",
+        },
+      },
+    },
+  },
   "/valor-capturado/{pk}": {
     get: {
       summary: "Obter um valor capturado pelo ID",
