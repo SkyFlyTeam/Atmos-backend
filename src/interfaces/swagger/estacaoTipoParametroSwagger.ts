@@ -1,6 +1,7 @@
 export const estacaoTipoParametroSwagger = {
   "/estacao-tipo-parametro": {
     post: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Criar uma ou mais relações estação-tipo parâmetro",
       description: "Aceita estacao_est_pk e tipo_parametro_pk como valores únicos ou arrays. Cria todas as combinações possíveis entre os valores fornecidos.",
       requestBody: {
@@ -94,6 +95,7 @@ export const estacaoTipoParametroSwagger = {
       },
     },
     get: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Listar todas as relações estação-tipo parâmetro",
       responses: {
         "200": {
@@ -141,6 +143,7 @@ export const estacaoTipoParametroSwagger = {
   },
   "/estacao-tipo-parametro/{pk}": {
     get: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Obter uma relação estação-tipo parâmetro pelo ID",
       parameters: [
         {
@@ -192,6 +195,7 @@ export const estacaoTipoParametroSwagger = {
       },
     },
     put: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Atualizar uma relação estação-tipo parâmetro",
       parameters: [
         {
@@ -261,6 +265,7 @@ export const estacaoTipoParametroSwagger = {
       },
     },
     delete: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Excluir uma relação estação-tipo parâmetro",
       parameters: [
         {
@@ -283,6 +288,7 @@ export const estacaoTipoParametroSwagger = {
   },
   "/estacao-tipo-parametro/estacao/{estacao_pk}": {
     get: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Listar todas as relações de uma estação específica",
       parameters: [
         {
@@ -329,6 +335,7 @@ export const estacaoTipoParametroSwagger = {
   },
   "/estacao-tipo-parametro/tipo-parametro/{tipo_parametro_pk}": {
     get: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Listar todas as relações de um tipo de parâmetro específico",
       parameters: [
         {
@@ -374,8 +381,71 @@ export const estacaoTipoParametroSwagger = {
       },
     },
   },
+  "/estacao-tipo-parametro/cidade/{cidade_pk}": {
+    get: {
+      tags: ["Estação Tipo Parâmetro"],
+      summary: "Listar todas as relações de uma cidade específica",
+      description: "Retorna todas as relações estação-tipo parâmetro para estações pertencentes a uma cidade.",
+      parameters: [
+        {
+          in: "path",
+          name: "cidade_pk",
+          required: true,
+          schema: { type: "integer" },
+          description: "ID da cidade (pk)",
+        },
+      ],
+      responses: {
+        "200": {
+          description: "Lista de relações da cidade",
+          content: {
+            "application/json": {
+              schema: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    pk: { type: "integer" },
+                    estacao_est_pk: { type: "integer" },
+                    tipo_parametro_pk: { type: "integer" },
+                    estacao: {
+                      type: "object",
+                      properties: {
+                        pk: { type: "integer" },
+                        uuid: { type: "string" },
+                        nome: { type: "string" },
+                        descricao: { type: "string" },
+                        status: { type: "boolean" },
+                        cidadePk: { type: "integer" },
+                      },
+                    },
+                    tipoParametro: {
+                      type: "object",
+                      properties: {
+                        pk: { type: "integer" },
+                        nome: { type: "string" },
+                        tipo: { type: "string" },
+                        unidade: { type: "string" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "404": {
+          description: "Nenhuma relação encontrada para esta cidade",
+        },
+        "500": {
+          description: "Erro ao buscar relações da cidade",
+        },
+      },
+    },
+  },
   "/estacao-tipo-parametro/estacao/{estacao_pk}/tipo-parametro/{tipo_parametro_pk}": {
     delete: {
+      tags: ["Estação Tipo Parâmetro"],
       summary: "Excluir uma relação específica entre estação e tipo de parâmetro",
       parameters: [
         {

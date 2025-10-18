@@ -15,7 +15,7 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_NAME=mydatabase
+      - DB_NAME=atmos
       - JWT_KEY=ATMOSSAPINHO
     depends_on:
       - postgres
@@ -27,7 +27,7 @@ services:
     environment:
       - POSTGRES_USER=postgres  # Usuário para o banco
       - POSTGRES_PASSWORD=postgres  # Senha do banco
-      - POSTGRES_DB=mydatabase    # Nome do banco de dados
+      - POSTGRES_DB=atmos    # Nome do banco de dados
     ports:
       - "5432:5432"             # Mapeia a porta 5432 para o host
     volumes:
