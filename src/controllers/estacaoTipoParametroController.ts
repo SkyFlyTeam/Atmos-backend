@@ -173,6 +173,32 @@ export const estacaoTipoParametroController = {
         }
     },
 
+    findByCidade: async (req: Request, res: Response) => {
+        try {
+            const { cidade_pk } = req.params  
+            const relacoes = await EstacaoTipoParametro.findAll({
+                include: [
+                    {
+                        model: Estacao,
+                        as: 'estacao'
+                    },
+                    {
+                        model: TipoParametro,
+                        as: 'tipoParametro'
+                    }
+                ]
+            })
+            .then(relacoes => relacoes.filter(rel => rel.estacao.cidadePk === Number(cidade_pk)))
+
+            if(!relacoes.length){
+                return res.status(404).json({ error: 'Nenhuma relação encontrada para esta cidade' })
+            }
+            return res.status(200).json(relacoes)
+        } catch (error) {
+            return res.status(500).json({error: 'Erro ao buscar relações da cidade', detalhes: error.message})
+        }
+    },
+
     update: async (req: Request, res: Response) => {
         try {
             const { pk } = req.params;

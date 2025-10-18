@@ -8,6 +8,7 @@ routes.get('/', estacaoTipoParametroController.findAll);     // Listar todas as 
 routes.get('/:pk', estacaoTipoParametroController.findById); // Buscar relação por ID
 routes.get('/estacao/:estacao_pk', estacaoTipoParametroController.findByEstacao); // Buscar relações por estação
 routes.get('/tipo-parametro/:tipo_parametro_pk', estacaoTipoParametroController.findByTipoParametro); // Buscar relações por tipo de parâmetro
+routes.get('/cidade/:cidade_pk', estacaoTipoParametroController.findByCidade); // Buscar relações por cidade
 routes.put('/:pk', estacaoTipoParametroController.update);   // Atualizar relação
 routes.delete('/:pk', estacaoTipoParametroController.delete); // Deletar relação por ID
 routes.delete('/estacao/:estacao_pk/tipo-parametro/:tipo_parametro_pk', estacaoTipoParametroController.deleteByEstacaoAndTipoParametro); // Deletar relação específica

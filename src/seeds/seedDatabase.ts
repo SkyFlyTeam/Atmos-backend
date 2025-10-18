@@ -1,4 +1,5 @@
 import sequelize from '../config/connection';
+import Cidade from '../models/Cidade';
 import Estacao from '../models/Estacao';
 import TipoParametro from '../models/TipoParametro';
 import EstacaoTipoParametro from '../models/EstacaoTipoParametro';
@@ -7,7 +8,26 @@ import ValorCapturado from '../models/ValorCapturado';
 async function seed() {
   await sequelize.sync({ force: true });
 
-  // Create Estacoes with all attributes
+  // Create Cidades
+  const cidades = await Cidade.bulkCreate([
+    {
+      ibgeId: 3550308,
+      nome: 'São Paulo',
+      uf: 'SP',
+    },
+    {
+      ibgeId: 3304557,
+      nome: 'Rio de Janeiro',
+      uf: 'RJ',
+    },
+    {
+      ibgeId: 3106200,
+      nome: 'Belo Horizonte',
+      uf: 'MG',
+    },
+  ]);
+
+  // Create Estacoes with cidade relationship
   const estacoes = await Estacao.bulkCreate([
     {
       uuid: 'est-001',
@@ -18,6 +38,7 @@ async function seed() {
       lat: '-23.5505',
       long: '-46.6333',
       endereco: 'Av. Central, 1000',
+      cidadePk: cidades[0].pk,
     },
     {
       uuid: 'est-002',
@@ -28,6 +49,7 @@ async function seed() {
       lat: '-23.5000',
       long: '-46.6000',
       endereco: 'Rua Norte, 200',
+      cidadePk: cidades[0].pk,
     },
     {
       uuid: 'est-003',
@@ -38,6 +60,7 @@ async function seed() {
       lat: '-23.6000',
       long: '-46.7000',
       endereco: 'Av. Sul, 300',
+      cidadePk: cidades[1].pk,
     },
   ]);
 
