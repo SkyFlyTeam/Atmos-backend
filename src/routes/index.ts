@@ -6,6 +6,8 @@ import valorcapturado from './valorCapturadoRoutes'
 import usuarioRoutes from './usuarioRoutes'
 import tipoAlertaRoutes from './tipoAlertaRoutes'
 import tipoAlertaParametroRoutes from './tipoAlertaParametroRoutes'
+import dashboardRoutes from './dashboardRoutes'
+import cidadeRoutes from './cidadeRoutes'
 
 const router = Router();
 
@@ -16,5 +18,7 @@ router.use('/tipo-parametro', tipoParametro)
 router.use('/valor-capturado', valorcapturado)
 router.use('/tipo-alerta', tipoAlertaRoutes)
 router.use('/tipo-alerta-parametro', tipoAlertaParametroRoutes)
+router.use('/dashboard', dashboardRoutes)
+router.use('/cidade', cidadeRoutes)
 
 export default router;

@@ -17,6 +17,6 @@ COPY . .
 EXPOSE 3000
 
 # Comando para rodar o servidor Express
-CMD ["npx", "ts-node", "src/seeds/seedDatabase.ts"]
+CMD npm start
 
-CMD ["npm", "start"]
+#  npx ts-node src/seeds/seedDatabase.ts && npm start
