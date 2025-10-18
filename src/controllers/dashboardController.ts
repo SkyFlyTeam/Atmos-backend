@@ -1,105 +1,233 @@
 import { Request, Response } from 'express'
+import { Op } from 'sequelize'
 import Estacao from '../models/Estacao'
 import ValorCapturado from '../models/ValorCapturado';
+import EstacaoTipoParametro from '../models/EstacaoTipoParametro';
+import { ParametroGrafico } from '../interfaces/dashboard/parametroGrafico';
+import { formatDateTimeToString } from '../utils/formatters/dateFormatters';
+import Cidade from '../models/Cidade';
+import TipoParametro from '../models/TipoParametro';
+import { ParametroCard } from '../interfaces/dashboard/parametroCard';
 
-export const estacaoController = {
-    findCapturedValuesFromStations: async (req: Request, res: Response) => {
+export const dashboardController = {
+    getCapturedValuesFromParameters: async (req: Request, res: Response) => {
         try {
-            const { cidade, estacao } = req.params;
-            const registros = await ValorCapturado.findAll();
+            const { cidade, estacoes, parametros, dataInicio, dataFim } = req.body;
 
-            if (!registros.length) {
-                return res.status(404).json({ error: 'Registros não encontrados' });
+            let cidadeEncontrada = await Cidade.findOne({ where: { pk: cidade } });
+
+            if (cidade && !cidadeEncontrada) {
+                return res.status(404).json({
+                    error: 'Cidade não encontrada'
+                });
+            }
+            
+            // Filtrar estações pela cidade, se fornecida
+            let estacoesFiltradas = await Estacao.findAll({
+                where: cidade ? { cidadePk: cidadeEncontrada.pk } : {},
+            });
+
+            // Filtrar estações específicas, se fornecidas
+            if (estacoes && estacoes.length > 0) {
+                estacoesFiltradas = estacoesFiltradas.filter((estacao: Estacao) => estacoes.includes(estacao.pk));
             }
 
-            // Converte cada registro para JSON e adiciona imagemBase64 se tiver
-            const resultado = registros.map((registro) => {
-                const json = registro.toJSON() as any;
-                if (registro.imagem) {
-                    json.imagemBase64 = `data:image/jpeg;base64,${registro.imagem.toString("base64")}`;
+            let parametrosEstacoes: EstacaoTipoParametro[] = [];
+            // Obter parâmetros das estações filtradas
+            for (const estacao of estacoesFiltradas) {
+                let parametrosByEstacao = await EstacaoTipoParametro.findAll({
+                    where: {
+                        estacao_est_pk: estacao.pk
+                    },
+                    include: [Estacao, TipoParametro]
+                });
+                parametrosEstacoes.push(...parametrosByEstacao);
+            }
+
+            // Filtrar parâmetros caso fornecidos
+            if (parametros && parametros.length > 0) {
+                parametrosEstacoes = parametrosEstacoes.filter((parametro: EstacaoTipoParametro) =>
+                    parametros.includes(parametro.tipo_parametro_pk)
+                );
+            }
+
+            // Obter valores capturados para os parâmetros filtrados dentro do intervalo de datas
+            let valoresCapturadosFiltrados: ValorCapturado[] = [];
+            for (const parametroEstacao of parametrosEstacoes) {
+                const valoresCapturados = await ValorCapturado.findAll({
+                    where: {
+                        Parametros_pk: parametroEstacao.pk,
+                        unixtime: {
+                            [Op.between]: [dataInicio, dataFim]
+                        }
+                    },
+                    include: [
+                        {
+                            model: EstacaoTipoParametro,
+                            as: 'parametro',
+                            include: [
+                                { model: Estacao, as: 'estacao' },
+                                { model: TipoParametro, as: 'tipoParametro' }
+                            ]
+                        }
+                    ]
+                });
+
+                valoresCapturadosFiltrados.push(...valoresCapturados);
+            }
+
+            let resultado: ParametroGrafico[] = [];
+
+            // Estruturar os dados para a resposta
+            const tipoParametros = [];
+            for (const parametroEstacao of parametrosEstacoes) {
+                if(!tipoParametros.find(tp => tp.pk === parametroEstacao.tipo_parametro_pk)) {
+                    tipoParametros.push(parametroEstacao.tipoParametro);
                 }
-                return json;
-            });
+            }
+            
+            for (const tipoParametro of tipoParametros) {
+                // Filtrar valores por tipo de parâmetro
+                const valores = valoresCapturadosFiltrados.filter(vc => 
+                    vc.parametro.tipo_parametro_pk === tipoParametro.pk
+                );
+
+                // Coletar nomes únicos das estações
+                const estacoesNomes = Array.from(new Set(
+                    valores.map(v => v.parametro.estacao.nome)
+                ));
+
+                // Agrupar valores por datetime
+                const dadosAgrupados = new Map<string, any>();
+                
+                for (const v of valores) {
+                    const datetime = formatDateTimeToString(v.unixtime);
+                    const estacaoNome = v.parametro.estacao.nome;
+                    
+                    if (!dadosAgrupados.has(datetime)) {
+                        dadosAgrupados.set(datetime, { datetime });
+                    }
+                    
+                    dadosAgrupados.get(datetime)[estacaoNome] = v.valor;
+                }
+
+                // Converter Map para array
+                const dados = Array.from(dadosAgrupados.values());
+
+                resultado.push({
+                    tipo_parametro: `${tipoParametro.nome} (${tipoParametro.unidade})`,
+                    estacoes: estacoesNomes,
+                    dados: dados
+                });
+            }
 
             return res.status(200).json(resultado);
         } catch (error: any) {
             return res.status(500).json({
-                error: 'Erro ao buscar registros',
+                error: 'Erro ao buscar registros capturados por parâmetros',
                 detalhes: error.message
             });
         }
     },
 
-    findById: async (req: Request, res: Response) => {
+    getLastCapturedValues: async (req: Request, res: Response) => {
         try {
-            const { pk } = req.params
-            const registro = await Estacao.findByPk(pk)
-            if (registro) {
-                const json = registro.toJSON();
-                if (registro.imagem) {
-                    json.imagemBase64 = `data:image/jpeg;base64,${registro.imagem.toString("base64")}`;
-                }
-                return res.status(200).json(json);
+            const { cidade, estacoes, parametros } = req.body;
+
+            let cidadeEncontrada = await Cidade.findOne({ where: { pk: cidade } });
+
+            if (cidade && !cidadeEncontrada) {
+                return res.status(404).json({
+                    error: 'Cidade não encontrada'
+                });
+            }
+            
+            // Filtrar estações pela cidade, se fornecida
+            let estacoesFiltradas = await Estacao.findAll({
+                where: cidade ? { cidadePk: cidadeEncontrada.pk } : {},
+            });
+
+            // Filtrar estações específicas, se fornecidas
+            if (estacoes && estacoes.length > 0) {
+                estacoesFiltradas = estacoesFiltradas.filter((estacao: Estacao) => estacoes.includes(estacao.pk));
             }
 
-            return res.status(404).json({ error: 'Registro não encontrado' });
+            let parametrosEstacoes: EstacaoTipoParametro[] = [];
+            // Obter parâmetros das estações filtradas
+            for (const estacao of estacoesFiltradas) {
+                let parametrosByEstacao = await EstacaoTipoParametro.findAll({
+                    where: {
+                        estacao_est_pk: estacao.pk
+                    },
+                    include: [Estacao, TipoParametro]
+                });
+                parametrosEstacoes.push(...parametrosByEstacao);
+            }
+
+            // Filtrar parâmetros caso fornecidos
+            if (parametros && parametros.length > 0) {
+                parametrosEstacoes = parametrosEstacoes.filter((parametro: EstacaoTipoParametro) =>
+                    parametros.includes(parametro.tipo_parametro_pk)
+                );
+            }
+
+            // Obter valores capturados para os parâmetros filtrados dentro do intervalo de datas
+            let valoresCapturadosFiltrados: ValorCapturado[] = [];
+            for (const parametroEstacao of parametrosEstacoes) {
+                const valoresCapturados = await ValorCapturado.findAll({
+                    where: {
+                        Parametros_pk: parametroEstacao.pk,
+                    },
+                    order: [['unixtime', 'DESC']], 
+                    limit: 2,
+                    include: [
+                        {
+                            model: EstacaoTipoParametro,
+                            as: 'parametro',
+                            include: [
+                                { model: TipoParametro, as: 'tipoParametro' }
+                            ]
+                        }
+                    ]
+                });
+
+                valoresCapturadosFiltrados.push(...valoresCapturados);
+            }
+
+            let resultado: ParametroCard[] = [];
+
+            // Estruturar os dados para a resposta
+            const tipoParametros = [];
+            for (const parametroEstacao of parametrosEstacoes) {
+                if(!tipoParametros.find(tp => tp.pk === parametroEstacao.tipo_parametro_pk)) {
+                    tipoParametros.push(parametroEstacao.tipoParametro);
+                }
+            }
+
+            for (const tipoParametro of tipoParametros) {
+                // Filtrar valores por tipo de parâmetro
+                const valores = valoresCapturadosFiltrados.filter(vc => 
+                    vc.parametro.tipo_parametro_pk === tipoParametro.pk
+                );
+
+                // Obter o valor mais recente e o anterior
+                const valorAtual = valores[0];
+                const valorAnterior = valores[1];
+
+                // Adicionar ao resultado
+                resultado.push({
+                    tipo_parametro: tipoParametro.nome,
+                    valor_atual: valorAtual ? valorAtual.valor : null,
+                    aumento: valorAnterior ? valorAtual.valor > valorAnterior.valor : null,
+                });
+            }
+
+            return res.status(200).json(resultado);
         } catch (error: any) {
             return res.status(500).json({
-                error: 'Erro ao buscar registro',
+                error: 'Erro ao buscar últimos registros capturados por parâmetros',
                 detalhes: error.message
             });
-        }
-    },
-
-    update: async (req: Request, res: Response) => {
-        try {
-            const { pk } = req.params;
-            const { imagemBase64, ...dados } = req.body;
-
-            const registro = await Estacao.findByPk(pk);
-            if (!registro) {
-                return res.status(404).json({ error: 'Registro não encontrado' });
-            }
-
-            // Processar imagem
-            let imagemData = registro.imagem; // mantém a atual por padrão
-
-            if (imagemBase64 === null) {
-                // pediu explicitamente para remover
-                imagemData = null;
-            } else if (typeof imagemBase64 === 'string' && imagemBase64.startsWith('data:image')) {
-                // veio uma nova imagem em Base64
-                imagemData = Buffer.from(imagemBase64.split(",")[1], "base64");
-            }
-            // Se não enviou nada (undefined), mantém a atual
-
-            await registro.update({
-                ...dados,
-                imagem: imagemData
-            });
-
-            return res.json(registro);
-        } catch (error: any) {
-            return res.status(400).json({
-                error: 'Erro ao atualizar estação',
-                detalhes: error.message
-            });
-        }
-    },
-
-    delete: async (req: Request, res: Response) => {
-        try {
-            const { pk } = req.params;
-
-            const deletado = await Estacao.destroy({ where: { pk } });
-
-            if (deletado) {
-                return res.status(204).send();
-            }
-
-            return res.status(404).json({ error: 'Registro não encontrado' });
-        } catch (error: any) {
-            return res.status(400).json({ error: 'Erro ao deletar registro', detalhes: error.message });
         }
     }
-} 
+};
