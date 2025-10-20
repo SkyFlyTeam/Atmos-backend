@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Estacao from '../models/Estacao'
-import Cidade from '../models/Cidade'  
+import Cidade from '../models/Cidade'
 
 // helper p/ montar a resposta
 function mapEstacao(registro: Estacao) {
@@ -55,7 +55,14 @@ export const estacaoController = {
 
   findAll: async (_req: Request, res: Response) => {
     try {
-      const registros = await Estacao.findAll();
+      const registros = await Estacao.findAll({
+        include: [
+          {
+            model: Cidade,
+            attributes: ['pk', 'ibgeId', 'nome', 'uf']
+          }
+        ]
+      });
 
       if (!registros.length) {
         return res.status(404).json({ error: 'Registros não encontrados' });
@@ -70,7 +77,14 @@ export const estacaoController = {
   findById: async (req: Request, res: Response) => {
     try {
       const { pk } = req.params;
-      const registro = await Estacao.findByPk(pk);
+      const registro = await Estacao.findByPk(pk, {
+        include: [
+          {
+            model: Cidade,
+            attributes: ['pk', 'ibgeId', 'nome', 'uf']
+          }
+        ]
+      });
       if (!registro) return res.status(404).json({ error: 'Registro não encontrado' });
       return res.status(200).json(mapEstacao(registro));
     } catch (error: any) {
