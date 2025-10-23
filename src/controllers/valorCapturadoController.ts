@@ -305,6 +305,14 @@ export const valorCapturadoController = {
             const valores = await ValorCapturado.findAll({
                 where: whereClause,
                 attributes: [
+                    [sequelize.fn('TO_CHAR',
+                        sequelize.fn('DATE_TRUNC', 'month', sequelize.col('unixtime')),
+                        'MM'
+                    ), 'mes'],
+                    [sequelize.fn('TO_CHAR',
+                        sequelize.fn('DATE_TRUNC', 'year', sequelize.col('unixtime')),
+                        'YYYY'
+                    ), 'ano'],
                     [sequelize.fn('MAX', sequelize.col('valor')), 'maximo'],
                     [sequelize.fn('MIN', sequelize.col('valor')), 'minimo'],
                     [sequelize.fn('AVG', sequelize.col('valor')), 'media'],
@@ -323,8 +331,8 @@ export const valorCapturadoController = {
                         ]
                     },
                 ],
-                order: [['estacao_id', 'ASC']],
-                group: ['Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
+                order: [['ano', 'DESC'],['mes', 'DESC'], ['estacao_id', 'ASC'], ['Parametros_pk', 'ASC']],
+                group: ['mes', 'ano', 'Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
             })
 
             if (!valores.length) {
