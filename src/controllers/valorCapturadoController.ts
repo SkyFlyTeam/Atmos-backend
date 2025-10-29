@@ -330,9 +330,13 @@ export const valorCapturadoController = {
                             }
                         ]
                     },
+                    {
+                        model: Estacao,
+                        as: 'estacao'
+                    }
                 ],
                 order: [['ano', 'DESC'],['mes', 'DESC'], ['estacao_id', 'ASC'], ['Parametros_pk', 'ASC']],
-                group: ['mes', 'ano', 'Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk']
+                group: ['mes', 'ano', 'Parametros_pk', 'estacao_id', 'parametro.pk', 'parametro->tipoParametro.pk', 'estacao.pk']
             })
 
             if (!valores.length) {
