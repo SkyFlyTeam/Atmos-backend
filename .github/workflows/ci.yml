@@ -41,4 +41,5 @@ jobs:
           TEST_DB_USER: postgres
           TEST_DB_PASSWORD: postgres
           TEST_DB_NAME: atmos_test
+          JWT_KEY: 123asd!@#
         run: npm run test:integration
