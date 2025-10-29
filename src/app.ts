@@ -25,20 +25,22 @@ app.use(bodyParser.urlencoded({ limit: "20mb", extended: true }));
 //   next();
 // });
 app.use(router);
-registerSwagger(app)
+registerSwagger(app);
 
 const PORT = process.env.PORT || 5000;
 
 // Sync database and then start the server
-sequelize.sync({ force: false })  // Altere para `true` se quiser recriar as tabelas durante o desenvolvimento
-  .then(async () => {
-    console.log('Database synchronized');
-
-    const server = app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+if (require.main === module) {
+  sequelize.sync({ force: false })
+    .then(async () => {
+      console.log('Database synchronized');
+      const server = app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Error syncing the database:', error);
     });
+}
 
-  })
-  .catch((error) => {
-    console.error('Error syncing the database:', error);
-  });
+export default app;
