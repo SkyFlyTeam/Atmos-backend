@@ -1,9 +1,9 @@
-import { usuarioController } from '../controllers/usuarioController'; // Importe o controlador
-import Usuario from '../models/Usuario'; // Importe o modelo
+import { usuarioController } from '../../controllers/usuarioController'; // Importe o controlador
+import Usuario from '../../models/Usuario'; // Importe o modelo
 import { Request, Response } from 'express';
 
 // Mock do modelo Usuario
-jest.mock('../models/Usuario', () => ({
+jest.mock('../../models/Usuario', () => ({
   findAll: jest.fn(),
 }));
 
