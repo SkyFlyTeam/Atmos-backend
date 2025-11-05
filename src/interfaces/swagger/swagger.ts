@@ -9,6 +9,7 @@ import { tipoAlertaSwagger } from './tipoAlertaSwagger'
 import { tipoAlertaParametroSwagger } from './tipoAlertaParametroSwagger'
 import { dashboardSwagger } from './dashboardSwagger'
 import { cidadeSwagger } from './cidadeSwagger' 
+import { alertaSwagger } from './alertaSwagger'
 
 export function registerSwagger(app: Express): void {
   const openapi = {
@@ -28,7 +29,8 @@ export function registerSwagger(app: Express): void {
       ...valorCapturadoSwagger,
       ...tipoAlertaSwagger,
       ...tipoAlertaParametroSwagger,
-      ...dashboardSwagger 
+      ...dashboardSwagger,
+      ...alertaSwagger
     },
   } as const
 
