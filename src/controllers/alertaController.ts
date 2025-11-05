@@ -101,7 +101,8 @@ export const alertaController = {
             return res.status(404).json({ error: 'Registro não encontrado' })
         }
 
-        const atualizado = await TipoAlertaParametro.update(req.body, { 
+        // Corrigir aqui: trocar TipoAlertaParametro por Alerta
+        const atualizado = await Alerta.update(req.body, { 
             where: { 
                 tipo_alerta_pk: tipoAlertaPk,
                 valor_capturado_pk: valorCapturadoPk

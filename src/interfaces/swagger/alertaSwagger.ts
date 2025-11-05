@@ -11,7 +11,7 @@ export const alertaSwagger = {
             example: {
               tipo_alerta_pk: 1,
               valor_capturado_pk: 2,
-              descricao: "Alerta de exemplo"
+              data: "2025-11-05T12:00:00Z"
             }
           }
         }
@@ -180,9 +180,7 @@ export const alertaSwagger = {
         properties: {
           tipo_alerta_pk: { type: "integer", format: "int32" },
           valor_capturado_pk: { type: "integer", format: "int32" },
-          descricao: { type: "string" },
-          createdAt: { type: "string", format: "date-time" },
-          updatedAt: { type: "string", format: "date-time" }
+          data: { type: "string", format: "date-time" },
         }
       },
       AlertaInput: {
@@ -191,7 +189,7 @@ export const alertaSwagger = {
         properties: {
           tipo_alerta_pk: { type: "integer", format: "int32" },
           valor_capturado_pk: { type: "integer", format: "int32" },
-          descricao: { type: "string" }
+          data: { type: "string", format: "date-time" }
         }
       },
       TipoAlerta: {
