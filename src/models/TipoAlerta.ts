@@ -22,7 +22,7 @@ export default class TipoAlerta extends Model {
     tipo!: string | null;
 
     @Column({
-        type: DataType.TEXT,
+        type: DataType.TEXT('long'),
         allowNull: true
     })
     descricao!: string | null;

@@ -8,6 +8,7 @@ import tipoAlertaRoutes from './tipoAlertaRoutes'
 import tipoAlertaParametroRoutes from './tipoAlertaParametroRoutes'
 import dashboardRoutes from './dashboardRoutes'
 import cidadeRoutes from './cidadeRoutes'
+import alertaRoutes from './alertaRoutes'
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/tipo-alerta', tipoAlertaRoutes)
 router.use('/tipo-alerta-parametro', tipoAlertaParametroRoutes)
 router.use('/dashboard', dashboardRoutes)
 router.use('/cidade', cidadeRoutes)
+router.use('/alerta', alertaRoutes)
 
 export default router;
