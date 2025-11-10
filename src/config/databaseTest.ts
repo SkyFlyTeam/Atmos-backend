@@ -1,6 +1,14 @@
 import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
 import Usuario from '../models/Usuario';
+import Alerta from '../models/Alerta';
+import TipoAlerta from '../models/TipoAlerta';
+import TipoAlertaParametro from '../models/TipoAlertaParametro';
+import TipoParametro from '../models/TipoParametro';
+import Estacao from '../models/Estacao';
+import EstacaoTipoParametro from '../models/EstacaoTipoParametro';
+import ValorCapturado from '../models/ValorCapturado';
+import Cidade from '../models/Cidade';
 
 dotenv.config();
 
@@ -12,7 +20,7 @@ const sequelizeTest = new Sequelize({
   password: process.env.TEST_DB_PASSWORD || 'root',
   database: process.env.TEST_DB_NAME || 'atmos_test',
   logging: false,
-  models: [Usuario],
+  models: [Usuario, Alerta, TipoAlerta, TipoAlertaParametro, TipoParametro, Estacao, EstacaoTipoParametro, Cidade, ValorCapturado],
 });
 
 export default sequelizeTest;
