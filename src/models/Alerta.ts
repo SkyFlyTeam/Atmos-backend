@@ -1,11 +1,9 @@
 import { Table, Column, Model, DataType, BelongsToMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import TipoParametro from './TipoParametro';
-import TipoAlertaParametro from './TipoAlertaParametro';
 import TipoAlerta from './TipoAlerta';
 import ValorCapturado from './ValorCapturado';
 
 @Table({
-    tableName: 'tipo_alerta',
+    tableName: 'alerta',
     timestamps: false
 })
 export default class Alerta extends Model {
@@ -16,12 +14,6 @@ export default class Alerta extends Model {
         autoIncrement: true
     })
     pk!: number;
-
-    @Column({
-        type: DataType.STRING(255),
-        allowNull: true
-    })
-    tipo!: string | null;
 
     @Column({
         type: DataType.DATE,
