@@ -149,9 +149,9 @@ export const alertaController = {
             return res.status(204).send();
         }
 
-        return res.status(404).json({ error: 'Registro não encontrado' });
+            return res.status(404).json({ error: 'Registro não encontrado' });
         } catch (error: any) {
-        return res.status(400).json({ error: 'Erro ao deletar registro', detalhes: error.message });
+            return res.status(400).json({ error: 'Erro ao deletar registro', detalhes: error.message });
         }
     }
 }

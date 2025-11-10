@@ -12,6 +12,6 @@ RUN npm rebuild bcrypt --build-from-source
 
 EXPOSE 5000
 
-CMD npm start
+# CMD npm start
 
-# CMD npx ts-node src/seeds/seedDatabase.ts && npm start
+CMD npx ts-node src/seeds/seedDatabase.ts && npm start
