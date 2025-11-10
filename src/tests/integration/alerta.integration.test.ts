@@ -28,10 +28,14 @@ describe('Alerta Integration Tests - Fluxo de Geração de Alertas', () => {
 
     // Criar estação
     estacao = await Estacao.create({
-      pk: 1,
-      nome: 'Estação Teste',
-      lat: -23.5505,
-      lon: -46.6333,
+      uuid: 'est-001',
+      nome: 'Estação Central',
+      descricao: 'Central station',
+      imagem: null,
+      status: true,
+      lat: '-23.5505',
+      long: '-46.6333',
+      endereco: 'Av. Central, 1000',
       cidade_pk: cidade.pk
     });
 
