@@ -22,7 +22,8 @@ describe('Alerta Integration Tests - Fluxo de Geração de Alertas', () => {
     // Criar cidade
     cidade = await Cidade.create({
       nome: 'Cidade Teste',
-      uf: 'SP'
+      uf: 'SP',
+      ibgeId: 123
     });
 
     // Criar estação
