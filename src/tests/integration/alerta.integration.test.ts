@@ -51,7 +51,7 @@ describe('Alerta Integration Tests - Fluxo de Geração de Alertas', () => {
 
     // Associar tipo de parâmetro à estação
     estacaoTipoParametro = await EstacaoTipoParametro.create({
-      estacao_pk: estacao.pk,
+      estacao_est_pk: estacao.pk,
       tipo_parametro_pk: tipoParametro.pk
     });
   });
