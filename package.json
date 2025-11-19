@@ -8,7 +8,8 @@
     "test:unit": "jest --coverage --testPathPatterns=\"/src/tests/unit/.*\"",
     "test:integration": "jest --coverage --runInBand --testPathPatterns=\"src/tests/integration/.*\"",
     "start": "tsc && node dist/app.js",
-    "build": "tsc"
+    "build": "tsc",
+    "seed:alerts": "ts-node src/seeds/seedAlerts.ts"
   },
   "author": "",
   "license": "ISC",
