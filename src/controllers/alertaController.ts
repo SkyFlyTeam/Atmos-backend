@@ -3,6 +3,7 @@ import TipoAlertaParametro from '../models/TipoAlertaParametro'
 import TipoAlerta from '../models/TipoAlerta'
 import Alerta from '../models/Alerta'
 import ValorCapturado from '../models/ValorCapturado'
+import Estacao from '../models/Estacao'
 
 export const alertaController = {
     save: async (req: Request, res: Response) => {
@@ -24,7 +25,13 @@ export const alertaController = {
                     },
                     {
                         model: ValorCapturado,
-                        as: 'valorCapturado'
+                        as: 'valorCapturado',
+                        include: [
+                            {
+                                model: Estacao,
+                                as: 'estacao'
+                            }
+                        ]
                     }
                 ]
             })
@@ -49,7 +56,13 @@ export const alertaController = {
                     },
                     {
                         model: ValorCapturado,
-                        as: 'valorCapturado'
+                        as: 'valorCapturado',
+                        include: [
+                            {
+                                model: Estacao,
+                                as: 'estacao'
+                            }
+                        ]
                     }
                 ]
             })
@@ -74,7 +87,13 @@ export const alertaController = {
                     },
                     {
                         model: ValorCapturado,
-                        as: 'valorCapturado'
+                        as: 'valorCapturado',
+                        include: [
+                            {
+                                model: Estacao,
+                                as: 'estacao'
+                            }
+                        ]
                     }
                 ]
             })
@@ -122,7 +141,13 @@ export const alertaController = {
                     },
                     {
                         model: ValorCapturado,
-                        as: 'valorCapturado'
+                        as: 'valorCapturado',
+                        include: [
+                            {
+                                model: Estacao,
+                                as: 'estacao'
+                            }
+                        ]
                     }
                 ]
             });
