@@ -70,13 +70,7 @@ jobs:
   pr_times:
     name: PR Approval to Merge Time
     runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request' && (
-        github.event.action == 'opened' ||
-        github.event.action == 'reopened' ||
-        github.event.action == 'synchronize' ||
-        github.event.action == 'closed'
-      )
+    if: github.event_name == 'pull_request' && github.event.action != 'synchronize'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
