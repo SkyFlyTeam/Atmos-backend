@@ -85,12 +85,6 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y jq gh
 
-      - name: Authenticate gh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-
       - name: Get PR timestamps
         id: pr
         run: |
@@ -123,12 +117,6 @@ jobs:
       - name: Install jq and gh
         run: |
           sudo apt-get update && sudo apt-get install -y jq gh
-
-      - name: Authenticate gh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       - name: Get changes requested count
         id: count
